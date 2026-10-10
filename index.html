@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2c3e50">
+  <title>Meu Ponto</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Meu Ponto</h1>
+    <div id="saldoHoje" class="saldo"></div>
+  </header>
+
+  <main>
+    <!-- ABA REGISTRAR -->
+    <section id="tab-registrar" class="tab active">
+      <button id="btnBaterPonto" class="btn-ponto">Bater Ponto</button>
+      <div id="statusHoje"></div>
+    </section>
+
+    <!-- ABA HISTÓRICO -->
+    <section id="tab-historico" class="tab">
+      <div id="listaHistorico"></div>
+    </section>
+
+    <!-- ABA RELATÓRIO -->
+    <section id="tab-relatorio" class="tab">
+      <label class="label-mes">
+        Mês do relatório:
+        <input type="month" id="mesRelatorio">
+      </label>
+      <div id="resumoMes"></div>
+      <div id="detalheMes"></div>
+    </section>
+
+    <!-- ABA CONFIG -->
+    <section id="tab-config" class="tab">
+      <h3>Horários previstos</h3>
+      <p class="ajuda">Serve para calcular a jornada diária e detectar horas extras.</p>
+
+      <label>Entrada: <input type="time" id="entradaPrevista"></label>
+      <label>Saída almoço: <input type="time" id="saidaAlmocoPrevista"></label>
+      <label>Volta almoço: <input type="time" id="voltaAlmocoPrevista"></label>
+      <label>Saída: <input type="time" id="saidaPrevista"></label>
+
+      <div class="info-jornada">
+        Jornada calculada: <strong id="infoJornada">--</strong>
+      </div>
+
+      <button id="salvarConfig">Salvar configurações</button>
+
+      <h3>Backup dos dados</h3>
+      <p class="ajuda">Recomendado exportar de vez em quando para não perder os registros.</p>
+      <button id="exportarDados" class="btn-secundario">Exportar backup (.json)</button>
+      <button id="importarDados" class="btn-secundario">Importar backup</button>
+      <input type="file" id="arquivoImport" accept=".json" hidden>
+    </section>
+  </main>
+
+  <nav>
+    <button data-tab="registrar" class="active">Registrar</button>
+    <button data-tab="historico">Histórico</button>
+    <button data-tab="relatorio">Relatório</button>
+    <button data-tab="config">Config</button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
