@@ -18,18 +18,16 @@
   </header>
 
   <main>
-    <!-- ABA REGISTRAR -->
     <section id="tab-registrar" class="tab active">
       <button id="btnBaterPonto" class="btn-ponto">Bater Ponto</button>
       <div id="statusHoje"></div>
     </section>
 
-    <!-- ABA HISTÓRICO -->
     <section id="tab-historico" class="tab">
+      <p class="ajuda">Toque em um dia para ver, editar ou excluir os pontos.</p>
       <div id="listaHistorico"></div>
     </section>
 
-    <!-- ABA RELATÓRIO -->
     <section id="tab-relatorio" class="tab">
       <label class="label-mes">
         Mês do relatório:
@@ -39,7 +37,6 @@
       <div id="detalheMes"></div>
     </section>
 
-    <!-- ABA CONFIG -->
     <section id="tab-config" class="tab">
       <h3>Horários previstos</h3>
       <p class="ajuda">Serve para calcular a jornada diária e detectar horas extras.</p>
@@ -69,6 +66,19 @@
     <button data-tab="relatorio">Relatório</button>
     <button data-tab="config">Config</button>
   </nav>
+
+  <!-- MODAL DE EDIÇÃO DE DIA -->
+  <div id="modalDia" class="modal">
+    <div class="modal-conteudo">
+      <div class="modal-header">
+        <h2 id="modalTitulo">Editar dia</h2>
+        <button id="fecharModal" class="btn-fechar">✕</button>
+      </div>
+      <div id="modalLista" class="modal-lista"></div>
+      <div id="modalAdicionar" class="modal-adicionar"></div>
+      <div id="modalRodape" class="modal-rodape"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

@@ -213,3 +213,131 @@ button#salvarConfig {
 
 .ajuda { font-size: 13px; color: #666; margin: 4px 0 12px; }
 .vazio { color: #999; font-size: 14px; text-align: center; padding: 20px; }
+
+/* ============ MODAL DE EDIÇÃO ============ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal.aberto { display: flex; }
+
+.modal-conteudo {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.2s ease-out;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #2c3e50;
+}
+.btn-fechar {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 12px;
+  font-family: inherit;
+}
+
+.modal-lista { margin-bottom: 12px; }
+
+.modal-ponto {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8f9fb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.modal-ponto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.modal-ponto-info strong { font-size: 14px; color: #2c3e50; }
+.modal-ponto-info span { font-size: 13px; color: #666; }
+
+.modal-ponto-acoes {
+  display: flex;
+  gap: 4px;
+}
+.btn-icone {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-icone:active { background: #eee; }
+
+.modal-adicionar {
+  margin: 16px 0;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+.modal-add-botoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.btn-add-tipo {
+  padding: 10px 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-add-tipo.entrada       { background: #27ae60; }
+.btn-add-tipo.saida_almoco  { background: #e67e22; }
+.btn-add-tipo.volta_almoco  { background: #e67e22; }
+.btn-add-tipo.saida         { background: #c0392b; }
+
+.modal-rodape {
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  margin-top: 12px;
+}
+.modal-resumo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.modal-resumo.positivo { color: #27ae60; }
+.modal-resumo.negativo { color: #c0392b; }
+.modal-resumo.incompleto { color: #f39c12; }
+
+.dia-historico { cursor: pointer; }
+.dia-historico:active { background: #f0f2f5; }

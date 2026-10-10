@@ -51,7 +51,6 @@ const formatarDuracao = (min) => {
 
 const formatarDataBR = (iso) => iso.split('-').reverse().join('/');
 
-// Jornada diária calculada a partir dos horários previstos
 function jornadaDiariaMin() {
   return minutosEntre(config.entradaPrevista, config.saidaAlmocoPrevista) +
          minutosEntre(config.voltaAlmocoPrevista, config.saidaPrevista);
@@ -150,7 +149,6 @@ function gerarRelatorio(mes) {
 
   const resultados = dias.map(calcularDia).filter(Boolean);
 
-  // Dias úteis do mês (seg-sex)
   const [ano, m] = mes.split('-').map(Number);
   const ultimoDia = new Date(ano, m, 0).getDate();
   let diasUteisMes = 0;
@@ -173,6 +171,148 @@ function gerarRelatorio(mes) {
     diasIncompletos:  resultados.filter(d => d.incompleto)
   };
 }
+
+// ============================================================
+//  MODAL DE EDIÇÃO DE DIA
+// ============================================================
+let diaEditando = null;
+
+function abrirModalDia(data) {
+  diaEditando = data;
+  const modal = document.getElementById('modalDia');
+  document.getElementById('modalTitulo').textContent = formatarDataBR(data);
+  renderModalPontos();
+  modal.classList.add('aberto');
+}
+
+function fecharModalDia() {
+  document.getElementById('modalDia').classList.remove('aberto');
+  diaEditando = null;
+}
+
+function renderModalPontos() {
+  const doDia = registrosDoDia(diaEditando);
+  const lista = document.getElementById('modalLista');
+  const calc = calcularDia(diaEditando);
+
+  if (!doDia.length) {
+    lista.innerHTML = '<p class="vazio">Nenhum ponto registrado neste dia.</p>';
+  } else {
+    lista.innerHTML = doDia.map(r => `
+      <div class="modal-ponto">
+        <div class="modal-ponto-info">
+          <strong>${LABELS[r.tipo]}</strong>
+          <span>${r.hora}</span>
+        </div>
+        <div class="modal-ponto-acoes">
+          <button onclick="editarPonto(${r.id})" class="btn-icone" title="Editar">✏️</button>
+          <button onclick="excluirPonto(${r.id})" class="btn-icone" title="Excluir">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Rodapé com resumo do dia
+  const rodape = document.getElementById('modalRodape');
+  if (calc && !calc.incompleto) {
+    rodape.innerHTML = `
+      <div class="modal-resumo">
+        <span>Trabalhado: <strong>${formatarDuracao(calc.trabalhado)}</strong></span>
+        <span class="${calc.saldo >= 0 ? 'positivo' : 'negativo'}">
+          Saldo: <strong>${formatarSaldo(calc.saldo)}</strong>
+        </span>
+      </div>
+    `;
+  } else if (calc) {
+    rodape.innerHTML = `<div class="modal-resumo incompleto">⚠️ Dia incompleto — ${formatarDuracao(calc.trabalhado)} até agora</div>`;
+  } else {
+    rodape.innerHTML = '';
+  }
+
+  // Botões de adicionar (só mostra tipos que ainda não foram registrados)
+  const tiposFeitos = doDia.map(r => r.tipo);
+  const tiposDisponiveis = SEQUENCIA.filter(t => !tiposFeitos.includes(t));
+  const divAdd = document.getElementById('modalAdicionar');
+
+  if (tiposDisponiveis.length) {
+    divAdd.innerHTML = `
+      <p class="ajuda">Adicionar ponto:</p>
+      <div class="modal-add-botoes">
+        ${tiposDisponiveis.map(t => `
+          <button onclick="adicionarPonto('${t}')" class="btn-add-tipo ${t}">
+            + ${LABELS[t]}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    divAdd.innerHTML = '<p class="ajuda">Todos os 4 pontos deste dia já foram registrados.</p>';
+  }
+}
+
+window.editarPonto = (id) => {
+  const ponto = registros.find(r => r.id === id);
+  if (!ponto) return;
+
+  const novaHora = prompt(
+    `Editar horário de "${LABELS[ponto.tipo]}"\nHorário atual: ${ponto.hora}\n\nDigite o novo horário (formato HH:MM):`,
+    ponto.hora
+  );
+
+  if (novaHora === null) return; // cancelou
+
+  const regex = /^([01]?\d|2[0-3]):([0-5]\d)$/;
+  if (!regex.test(novaHora)) {
+    alert('Horário inválido. Use o formato HH:MM (ex: 08:30).');
+    return;
+  }
+
+  const [h, m] = novaHora.split(':');
+  ponto.hora = `${h.padStart(2,'0')}:${m}`;
+  salvar();
+  renderModalPontos();
+  renderTudo();
+};
+
+window.excluirPonto = (id) => {
+  const ponto = registros.find(r => r.id === id);
+  if (!ponto) return;
+  if (!confirm(`Excluir "${LABELS[ponto.tipo]}" das ${ponto.hora}?`)) return;
+
+  registros = registros.filter(r => r.id !== id);
+  salvar();
+  renderModalPontos();
+  renderTudo();
+};
+
+window.adicionarPonto = (tipo) => {
+  const hora = prompt(
+    `Adicionar "${LABELS[tipo]}"\n\nDigite o horário (formato HH:MM):`,
+    config[tipo === 'entrada' ? 'entradaPrevista'
+         : tipo === 'saida_almoco' ? 'saidaAlmocoPrevista'
+         : tipo === 'volta_almoco' ? 'voltaAlmocoPrevista'
+         : 'saidaPrevista']
+  );
+
+  if (hora === null) return;
+
+  const regex = /^([01]?\d|2[0-3]):([0-5]\d)$/;
+  if (!regex.test(hora)) {
+    alert('Horário inválido. Use o formato HH:MM (ex: 08:30).');
+    return;
+  }
+
+  const [h, m] = hora.split(':');
+  registros.push({
+    id: Date.now(),
+    data: diaEditando,
+    hora: `${h.padStart(2,'0')}:${m}`,
+    tipo
+  });
+  salvar();
+  renderModalPontos();
+  renderTudo();
+};
 
 // ============================================================
 //  RENDERIZAÇÃO
@@ -238,7 +378,7 @@ function renderHistorico() {
     ).join('');
 
     return `
-      <div class="dia-historico ${classe}">
+      <div class="dia-historico ${classe}" onclick="abrirModalDia('${data}')">
         <div class="cabecalho-dia">
           <strong>${formatarDataBR(data)}</strong>
           <span>${calc.incompleto ? '⚠️ Incompleto' : formatarSaldo(calc.saldo)}</span>
@@ -360,9 +500,15 @@ document.getElementById('salvarConfig').onclick = () => {
   renderTudo();
 };
 
+// Fechar modal ao tocar fora ou no botão X
+document.getElementById('fecharModal').onclick = fecharModalDia;
+document.getElementById('modalDia').onclick = (e) => {
+  if (e.target.id === 'modalDia') fecharModalDia();
+};
+
 // Exportar backup
 document.getElementById('exportarDados').onclick = () => {
-  const backup = { config, registros, versao: 3, exportadoEm: new Date().toISOString() };
+  const backup = { config, registros, versao: 4, exportadoEm: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -372,7 +518,6 @@ document.getElementById('exportarDados').onclick = () => {
   URL.revokeObjectURL(url);
 };
 
-// Importar backup
 document.getElementById('importarDados').onclick = () => {
   document.getElementById('arquivoImport').click();
 };
