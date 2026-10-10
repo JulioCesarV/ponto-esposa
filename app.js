@@ -259,7 +259,7 @@ window.editarPonto = (id) => {
     ponto.hora
   );
 
-  if (novaHora === null) return; // cancelou
+  if (novaHora === null) return;
 
   const regex = /^([01]?\d|2[0-3]):([0-5]\d)$/;
   if (!regex.test(novaHora)) {
@@ -464,11 +464,103 @@ function renderConfig() {
     formatarDuracao(jornadaDiariaMin());
 }
 
+function atualizarBotaoFlutuante() {
+  const btn = document.getElementById('btnAddRetro');
+  if (!btn) return;
+  const isHistorico = document.getElementById('tab-historico')?.classList.contains('active');
+  btn.style.display = isHistorico ? 'flex' : 'none';
+}
+
 function renderTudo() {
   renderBotaoPrincipal();
   if (document.getElementById('tab-historico').classList.contains('active')) renderHistorico();
   if (document.getElementById('tab-relatorio').classList.contains('active')) renderRelatorio();
   if (document.getElementById('tab-config').classList.contains('active'))    renderConfig();
+  atualizarBotaoFlutuante();
+}
+
+// ============================================================
+//  MODAL DE PONTO RETROATIVO
+// ============================================================
+function abrirModalRetro() {
+  const modal = document.getElementById('modalRetro');
+  const hoje = hojeISO();
+
+  document.getElementById('retroData').value = hoje;
+  document.getElementById('retroData').max = hoje;
+  document.getElementById('retroHora').value = horaAgora();
+  document.getElementById('retroTipo').value = 'entrada';
+  document.getElementById('retroAviso').textContent = '';
+
+  atualizarAvisoRetro();
+  modal.classList.add('aberto');
+}
+
+function fecharModalRetro() {
+  document.getElementById('modalRetro').classList.remove('aberto');
+}
+
+function atualizarAvisoRetro() {
+  const data = document.getElementById('retroData').value;
+  const tipo = document.getElementById('retroTipo').value;
+  const aviso = document.getElementById('retroAviso');
+
+  if (!data) {
+    aviso.textContent = '';
+    return;
+  }
+
+  const doDia = registrosDoDia(data);
+  const jaTem = doDia.some(r => r.tipo === tipo);
+
+  if (jaTem) {
+    aviso.className = 'retro-aviso erro';
+    aviso.textContent = `⚠️ Já existe um ponto do tipo "${LABELS[tipo]}" nesse dia. Se salvar, ficará duplicado.`;
+  } else {
+    const faltam = SEQUENCIA.filter(t => !doDia.some(r => r.tipo === t));
+    if (faltam.length) {
+      aviso.className = 'retro-aviso info';
+      aviso.textContent = `Este dia ainda está faltando: ${faltam.map(t => LABELS[t]).join(', ')}.`;
+    } else {
+      aviso.textContent = '';
+    }
+  }
+}
+
+function salvarRetro() {
+  const data = document.getElementById('retroData').value;
+  const tipo = document.getElementById('retroTipo').value;
+  const hora = document.getElementById('retroHora').value;
+
+  if (!data || !tipo || !hora) {
+    alert('Preencha data, tipo e hora.');
+    return;
+  }
+
+  if (data > hojeISO()) {
+    alert('Não é possível adicionar ponto em data futura.');
+    return;
+  }
+
+  const doDia = registrosDoDia(data);
+  const jaTem = doDia.some(r => r.tipo === tipo);
+
+  if (jaTem) {
+    if (!confirm(`Já existe "${LABELS[tipo]}" nesse dia. Adicionar mesmo assim (ficará duplicado)?`)) {
+      return;
+    }
+  }
+
+  registros.push({
+    id: Date.now(),
+    data,
+    hora,
+    tipo
+  });
+
+  salvar();
+  fecharModalRetro();
+  renderTudo();
 }
 
 // ============================================================
@@ -500,10 +592,21 @@ document.getElementById('salvarConfig').onclick = () => {
   renderTudo();
 };
 
-// Fechar modal ao tocar fora ou no botão X
+// Fechar modal de edição ao tocar fora ou no botão X
 document.getElementById('fecharModal').onclick = fecharModalDia;
 document.getElementById('modalDia').onclick = (e) => {
   if (e.target.id === 'modalDia') fecharModalDia();
+};
+
+// Eventos do modal retroativo
+document.getElementById('btnAddRetro').onclick = abrirModalRetro;
+document.getElementById('fecharRetro').onclick = fecharModalRetro;
+document.getElementById('btnSalvarRetro').onclick = salvarRetro;
+document.getElementById('retroData').onchange = atualizarAvisoRetro;
+document.getElementById('retroTipo').onchange = atualizarAvisoRetro;
+
+document.getElementById('modalRetro').onclick = (e) => {
+  if (e.target.id === 'modalRetro') fecharModalRetro();
 };
 
 // Exportar backup

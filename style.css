@@ -341,3 +341,83 @@ button#salvarConfig {
 
 .dia-historico { cursor: pointer; }
 .dia-historico:active { background: #f0f2f5; }
+
+/* ============ BOTÃO FLUTUANTE ============ */
+.btn-flutuante {
+  position: fixed;
+  right: 20px;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #27ae60;
+  color: white;
+  border: none;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none; /* controlado via JS */
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  font-family: inherit;
+  transition: transform 0.15s;
+}
+.btn-flutuante:active {
+  transform: scale(0.92);
+}
+
+/* ============ MODAL RETROATIVO ============ */
+.campo-retro {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: #444;
+}
+
+.campo-retro input,
+.campo-retro select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  background: white;
+}
+
+.retro-aviso {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+.retro-aviso.info {
+  background: #ebf5fb;
+  color: #2471a3;
+}
+.retro-aviso.erro {
+  background: #fdedec;
+  color: #a93226;
+}
+
+.btn-primario {
+  width: 100%;
+  padding: 14px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 4px;
+}
+.btn-primario:active {
+  background: #219653;
+}

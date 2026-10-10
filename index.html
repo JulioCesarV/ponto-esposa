@@ -80,6 +80,43 @@
     </div>
   </div>
 
+  <!-- MODAL DE ADICIONAR DIA RETROATIVO -->
+  <div id="modalRetro" class="modal">
+    <div class="modal-conteudo">
+      <div class="modal-header">
+        <h2>Adicionar ponto retroativo</h2>
+        <button id="fecharRetro" class="btn-fechar">✕</button>
+      </div>
+
+      <label class="campo-retro">
+        Data:
+        <input type="date" id="retroData">
+      </label>
+
+      <label class="campo-retro">
+        Tipo:
+        <select id="retroTipo">
+          <option value="entrada">Entrada</option>
+          <option value="saida_almoco">Saída Almoço</option>
+          <option value="volta_almoco">Volta Almoço</option>
+          <option value="saida">Saída</option>
+        </select>
+      </label>
+
+      <label class="campo-retro">
+        Hora:
+        <input type="time" id="retroHora">
+      </label>
+
+      <div id="retroAviso" class="retro-aviso"></div>
+
+      <button id="btnSalvarRetro" class="btn-primario">Adicionar ponto</button>
+    </div>
+  </div>
+
+  <!-- BOTÃO FLUTUANTE -->
+  <button id="btnAddRetro" class="btn-flutuante" title="Adicionar ponto retroativo">+</button>
+
   <script src="app.js"></script>
 </body>
 </html>
